@@ -1,0 +1,7 @@
+/target/
+.DS_Store
+/public
+/node_modules
+.env
+/dist
+.cargo
