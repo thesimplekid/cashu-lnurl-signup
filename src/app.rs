@@ -36,7 +36,7 @@ pub enum Msg {
 }
 
 async fn get_pubkey() -> Result<Option<String>> {
-    let key = unsafe { bindings::get_pubkey().await };
+    let key = bindings::get_pubkey().await;
     Ok(key.as_string())
 }
 
@@ -75,8 +75,8 @@ impl Component for App {
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         fn create_client(pubkey: &str) -> Client {
-            let connect_relay = Url::from_str("wss://thesimplekid.space/").unwrap();
-            let key = XOnlyPublicKey::from_str(&pubkey).unwrap();
+            let connect_relay = Url::from_str(env!("RELAY")).unwrap();
+            let key = XOnlyPublicKey::from_str(pubkey).unwrap();
             let keys = Keys::from_public_key(key);
             let client = Client::new(&keys);
 
@@ -146,17 +146,15 @@ impl Component for App {
                     debug!("client");
                     let client_clone = client.clone();
                     let pubkey = client.keys().public_key();
-                    let rec_pubkey = self.lnurl_service_pubkey.clone();
+                    let rec_pubkey = self.lnurl_service_pubkey;
 
                     spawn_local(async move {
-                        let cipher_text = unsafe {
-                            encrypt_content(
-                                rec_pubkey.to_string(),
-                                serde_json::to_string(&signup_msg).unwrap(),
-                            )
-                            .await
-                            .as_string()
-                        };
+                        let cipher_text = encrypt_content(
+                            rec_pubkey.to_string(),
+                            serde_json::to_string(&signup_msg).unwrap(),
+                        )
+                        .await
+                        .as_string();
 
                         let event = EventBuilder::new(
                             nostr_sdk::Kind::Custom(20420),
@@ -176,16 +174,15 @@ impl Component for App {
                             })
                             .collect::<Array>();
 
-                        let signed_event = unsafe {
-                            sign_event(
-                                event.created_at.as_i64(),
-                                event.content,
-                                tags,
-                                event.pubkey.to_string(),
-                            )
-                            .await
-                            .as_string()
-                        };
+                        let signed_event = sign_event(
+                            event.created_at.as_i64(),
+                            event.content,
+                            tags,
+                            event.pubkey.to_string(),
+                        )
+                        .await
+                        .as_string();
+
                         if let Some(event) = signed_event {
                             let event: Event = serde_json::from_str(&event).unwrap();
                             debug!("sig: {:?}", event.as_json());

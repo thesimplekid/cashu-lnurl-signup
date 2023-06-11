@@ -1,7 +1,9 @@
-### Nostr Connect (NIP46) WASM
+### Web app to register for Cashu lnurl service
 
-An almost useless [NIP46](https://github.com/nostr-protocol/nips/blob/master/46.md) example using [yew.rs](https://yew.rs/) with delegation
+https://github.com/thesimplekid/cashu-lnurl
 
+Set env var `LNURL_SERVICE_PUBKEY` at build to with the pubkey of the service
+`RELAY` with the nostr relay the service listens on.
 
 
 ### Building
@@ -19,4 +21,3 @@ trunk serve --open
 ```
 
 
-For now the best way to test with delegation is with nostr-tools https://github.com/thesimplekid/nostr-tool/tree/nostr-connect. 
