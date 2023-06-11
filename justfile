@@ -1,4 +1,5 @@
 run-dev:
+    npx tailwindcss -i ./input.css -o ./public/css/out.css
     trunk serve
 check:
     cargo fmt --check --all
